@@ -1,12 +1,22 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from core.models import Comunicado, Categoria
-from .forms import UsuarioForm, ComunicadoForm, CategoriaForm
+from .forms import CrearUsuarioForm, ComunicadoForm, CategoriaForm
 from django.contrib.auth.forms import UserCreationForm
 
-
 def home(request):
-    return render(request, 'core/home.html')
+    nivel_filter = request.GET.get('nivel', '')  # Obtener el valor seleccionado del menú desplegable de nivel
+    categoria_filter = request.GET.get('categoria', '')  # Obtener el valor seleccionado del menú desplegable de categoría
+
+    comunicados = Comunicado.objects.order_by('-fecha_envio')
+
+    if nivel_filter:
+        comunicados = comunicados.filter(nivel=nivel_filter)
+
+    if categoria_filter:
+        comunicados = comunicados.filter(categoria=categoria_filter)
+
+    return render(request, 'home.html', {'comunicados': comunicados})
 
 def registro(request):
     if request.method == 'POST':
@@ -19,18 +29,16 @@ def registro(request):
 
 @login_required
 def crear_usuario(request):
-    # Verificar si el usuario actual es superadmin
-    if not request.user.is_superuser:
-        return redirect('home')
-
     if request.method == 'POST':
-        form = UsuarioForm(request.POST)
+        form = CrearUsuarioForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect('home')  # Replace 'home' with the name of the URL pattern for your homepage
     else:
-        form = UsuarioForm()
-    render(request, 'core/crear_usuario.html')
+        form = CrearUsuarioForm()
+    
+    return render(request, 'crear_usuario.html', {'form': form})
+
 
 @login_required
 def crear_comunicado(request):
@@ -52,6 +60,7 @@ def lista_comunicados(request):
 
 def filtrar_comunicados(request, nivel):
     comunicados = Comunicado.objects.filter(nivel=nivel)
+    # localhost:8000/comunicados/filtrar/GEN
     return render(request, 'core/lista_comunicados.html', {'comunicados': comunicados})
 
 @login_required
@@ -65,6 +74,19 @@ def crear_categoria(request):
         form = CategoriaForm()
     
     return render(request, 'core/crear_categoria.html', {'form': form})
+
+def login_view(request):
+    if request.method == 'POST':
+        # Procesar los datos del formulario de login
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('home')  # Reemplaza 'home' con el nombre de tu URL de la página de inicio
+
+    return render(request, 'login.html')
 
 def lista_categorias(request):
     categorias = Categoria.objects.all()

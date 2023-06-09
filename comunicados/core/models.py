@@ -10,10 +10,10 @@ class Categoria(models.Model):
 
 class Comunicado(models.Model):
     NIVELES = (
-        ('General', 'General'),
-        ('Preescolar', 'Preescolar'),
-        ('Basico', 'Básico'),
-        ('Medio', 'Medio'),
+        ('GEN', 'General'),
+        ('PRE', 'Preescolar'),
+        ('BAS', 'Básico'),
+        ('MED', 'Medio'),
     )
 
     titulo = models.CharField(max_length=100)
@@ -21,7 +21,7 @@ class Comunicado(models.Model):
     nivel = models.CharField(max_length=20, choices=NIVELES)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     fecha_envio = models.DateTimeField(auto_now_add=True)
-    fecha_ultima_modificacion = models.DateTimeField(auto_now=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
