@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comunicados - Página Principal</title>
+</head>
+<body>
+    <h1>Bienvenido a la Aplicación de Comunicados</h1>
+
+    <!-- Aquí puedes agregar contenido adicional, como enlaces a diferentes secciones de la aplicación o mensajes de bienvenida -->
+
+    {% if user.is_superuser %}
+        <a href="{% url 'crear_categoria' %}">Crear Categoría</a>
+        <a href="{% url 'crear_usuario' %}">Crear Usuario</a>
+    {% endif %}
+    {% if user.is_authenticated %}
+        <!-- Si el usuario está autenticado, puedes mostrar opciones adicionales, como enlaces para crear comunicados o categorías -->
+        <a href="{% url 'crear_comunicado' %}">Crear Comunicado</a>
+    {% else %}
+        <!-- Si el usuario no está autenticado, puedes mostrar un mensaje o enlace para iniciar sesión o registrarse -->
+        <p>Por favor, inicia sesión o regístrate para acceder a las funcionalidades de la aplicación.</p>
+        <a href="{% url 'login' %}">Iniciar Sesión</a>
+        <a href="{% url 'registro' %}">Registrarse</a>
+    {% endif %}
+    
+    {% for comunicado in comunicados %}
+        <h3>{{ comunicado.titulo }}</h3>
+        <p>{{ comunicado.detalle }}</p>
+        <p>Nivel: {{ comunicado.nivel }}</p>
+        <p>Categoría: {{ comunicado.categoria }}</p>
+        <p>Fecha de Envío: {{ comunicado.fecha_envio }}</p>
+        <p>Fecha Última Modificación: {{ comunicado.fecha_modificacion }}</p>
+        <p>Usuario: {{ comunicado.usuario }}</p>
+        <hr>
+    {% empty %}
+        <p>No hay comunicados disponibles.</p>
+    {% endfor %}
+</body>
+</html>
